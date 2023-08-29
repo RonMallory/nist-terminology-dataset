@@ -88,4 +88,46 @@ def preprocess_data(
     # Create a new DataFrame from the list of new rows
     fully_flattened_df = pd.DataFrame(new_rows)
 
+    # Change all values to lowercase
+    fully_flattened_df = fully_flattened_df.applymap(
+        lambda x: x.lower().strip() if isinstance(x, str) else x
+    )
+
+    # Group the DataFrame by the 'term' column and use 'ffill' and 'bfill' to fill NaN values within each group
+    fully_flattened_df = fully_flattened_df.groupby("term", group_keys=False).apply(
+        lambda group: group.ffill().bfill()
+    )
+
+    # Reset the index for the DataFrame
+    fully_flattened_df.reset_index(drop=True, inplace=True)
+
+    # Extract the last part of the URL in the 'link' column and use it to fill NaN values in 'abbrSyn'
+    fully_flattened_df["abbrSyn"] = fully_flattened_df.apply(
+        lambda row: row["link"].split("/")[-1]
+        if pd.isna(row["abbrSyn"])
+        else row["abbrSyn"],
+        axis=1,
+    )
+
+    # Update the 'definitions' column based on the condition for 'abbrSyn'
+    fully_flattened_df["definitions"] = fully_flattened_df.apply(
+        lambda row: f"{row['abbrSyn']}: {row['link'].split('/')[-1].replace('_', ' ')}"
+        if (pd.isna(row["definitions"]))
+        else row["definitions"],
+        axis=1,
+    )
+
+    # Identify and drop duplicated rows based on all given columns
+    fully_flattened_df.drop_duplicates(
+        subset=["term", "link", "abbrSyn", "definitions"], keep="first", inplace=True
+    )
+
+    # if 'term' is NaN or empty, replace 'term' with the last part of 'link' without underscores
+    fully_flattened_df["term"] = fully_flattened_df.apply(
+        lambda row: row["link"].split("/")[-1].replace("_", " ")
+        if pd.isna(row["term"]) or row["term"] == ""
+        else row["term"],
+        axis=1,
+    )
+
     return fully_flattened_df
