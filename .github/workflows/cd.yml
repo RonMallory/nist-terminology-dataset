@@ -1,10 +1,15 @@
 name: Python CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    push:
+      branches: [ main ]
+      paths:
+        - 'src/**'
+    pull_request:
+      branches: [ main ]
+      paths:
+        - 'src/**'
+
 
 jobs:
   build:
@@ -45,3 +50,13 @@ jobs:
 
     - name: Run Application
       run: poetry run python src/main.py
+
+    - name: Install Kaggle CLI
+      run: pip install kaggle
+
+    - name: Create Kaggle Dataset
+      run: |
+        kaggle datasets version -p ./data -m "${{ github.event.head_commit.message }}"
+      env:
+        KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
