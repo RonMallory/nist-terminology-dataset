@@ -42,3 +42,28 @@ jobs:
 
     - name: Run mypy
       run: poetry run mypy .
+
+    - name: Run Application
+      run: poetry run python src/main.py
+
+  publish_to_kaggle:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.modified, 'src/')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - name: Install Kaggle CLI
+      run: pip install kaggle
+
+    - name: Create Kaggle Dataset
+      run: |
+        kaggle datasets version -p ./data -m "${{ github.event.head_commit.message }}"
+      env:
+        KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}

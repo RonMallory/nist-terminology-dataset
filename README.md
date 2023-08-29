@@ -1,12 +1,15 @@
-# Data Science Example
+# nist-terminology-dataset
 
-This project demonstrates the setup and usage of a repo for data science projects, specifically showcasing the [DSLP](https://github.com/dslp/dslp/tree/main) branching strategy.
+This project creates a dataset from the nist glossary of terms. The dataset is published to kaggle here: [TBD]()
 
 ## Table of Contents
-- [Data Science Example](#data-science-example)
+- [nist-terminology-dataset](#nist-terminology-dataset)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Pre-Commit Hooks](#pre-commit-hooks)
+  - [Publishing Kaggle Dataset](#publishing-kaggle-dataset)
+    - [Initial Publish](#initial-publish)
+    - [Github action updating dataset.](#github-action-updating-dataset)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -36,6 +39,28 @@ This project uses `pre-commit` to maintain code quality and consistency. The fol
 ```bash
 pre-commit install
 ```
+
+## Publishing Kaggle Dataset
+
+The init dataset is published manually while additional updates to the dataset occur in github actions.
+
+### Initial Publish
+
+1. Create api token from kaggle account settings
+2. Run the following command to generate the dataset.csv and the kaggle-metadata.json files
+```bash
+poetry run python src/main.py
+```
+3. Run the following command to publish the dataset to kaggle
+```bash
+kaggle datasets create -p ./data"
+```
+
+### Github action updating dataset.
+
+1. With the kaggle.json file that was created in [Initial Publish](#initial-publish) create a github secret with the name KAGGLE_USERNAME and KAGGLE_KEY
+2. Once a pull request has been approved and merged into the main branch the github action will run and update the dataset.
+   1. The ci.yml file will use the commit message to annotate the dataset with the changes made.
 
 ## Contributing
 

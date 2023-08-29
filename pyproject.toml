@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "nist-termonology-dataset"
-version = "0.1.0"
-description = "Project to demonstrate setting up a repo for use with data science projects."
+name = "nist-terminology-dataset"
+version = "0.1.1"
+description = "Project that creates a kaggle dataset from nist glossary terms."
 authors = ["Ron Mallory <ronnymallory@gmail.com>"]
 license = "MIT"
 readme = "README.md"
