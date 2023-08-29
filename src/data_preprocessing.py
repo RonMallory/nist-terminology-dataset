@@ -1,7 +1,14 @@
 import json
+import re
 import pandas as pd
 from pandas import json_normalize
 from typing import List, Dict, Union
+
+
+# Function to remove HTML tags
+def remove_html_tags(text: str) -> str:
+    clean = re.compile("<.*?>")
+    return re.sub(clean, "", text)
 
 
 def load_json_data(file_path: str) -> Dict[str, Union[str, List[Dict[str, str]]]]:
@@ -122,12 +129,7 @@ def preprocess_data(
         subset=["term", "link", "abbrSyn", "definitions"], keep="first", inplace=True
     )
 
-    # if 'term' is NaN or empty, replace 'term' with the last part of 'link' without underscores
-    fully_flattened_df["term"] = fully_flattened_df.apply(
-        lambda row: row["link"].split("/")[-1].replace("_", " ")
-        if pd.isna(row["term"]) or row["term"] == ""
-        else row["term"],
-        axis=1,
-    )
+    # remove html tags from 'term' column
+    fully_flattened_df["term"] = fully_flattened_df["term"].apply(remove_html_tags)
 
     return fully_flattened_df
