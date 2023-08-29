@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import logging
 
@@ -74,6 +75,13 @@ def write_df_to_csv(df: pd.DataFrame, output_path: str) -> None:
     - None
     """
     logging.info(f"Writing DataFrame to {output_path}.")
+
+    # Create the directory if it doesn't exist
+    output_directory = os.path.dirname(output_path)
+    if not os.path.exists(output_directory):
+        logging.info(f"Creating directory {output_directory}.")
+        os.makedirs(output_directory)
+
     try:
         df.to_csv(output_path, index=False)
         logging.info(f"DataFrame has been successfully written to {output_path}")
